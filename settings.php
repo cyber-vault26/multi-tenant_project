@@ -1,0 +1,101 @@
+<?php
+require 'db.php';
+require 'includes/functions.php';
+session_start();
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: login.php"); exit();
+}
+
+$tenant_id = $_SESSION['tenant_id'];
+
+$stmt = $pdo->prepare("SELECT * FROM tenants WHERE id = ?");
+$stmt->execute([$tenant_id]);
+$tenant = $stmt->fetch();
+ 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = $_POST['name'];
+    $currency = $_POST['currency'];
+    $address = $_POST['address'];
+    $phone = $_POST['phone'];
+
+    $stmt = $pdo->prepare("UPDATE tenants SET name = ?, currency = ?, address = ?, phone = ? WHERE id = ?");
+    $stmt->execute([$name, $currency, $address, $phone, $tenant_id]);
+    
+    logAction($pdo, "Settings Updated", "Updated workspace branding and info.");
+    header("Location: settings.php?msg=updated");
+    exit();
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Workspace Settings — Strong Bridge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>body { background-color: #020617; color: white; } .glass { background: rgba(15,23,42,0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }</style>
+</head>
+<body class="p-8 lg:ml-64 bg-slate-950 min-h-screen">
+    <?php include 'includes/sidebar.php'; ?>
+
+    <div class="max-w-3xl mx-auto">
+        <header class="mb-10">
+            <h1 class="text-3xl font-bold">Workspace Settings</h1>
+            <p class="text-slate-500 text-sm">Manage your company branding and configuration.</p>
+        </header>
+
+        <?php if(isset($_GET['msg'])) echo "<div class='bg-emerald-500/10 text-emerald-400 p-4 rounded-xl mb-6 border border-emerald-500/20'>Changes saved successfully!</div>"; ?>
+
+        <div class="glass p-10 rounded-[2.5rem]">
+            <form method="POST" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Company Name</label>
+                        <input type="text" name="name" value="<?php echo htmlspecialchars($tenant['name']); ?>" required 
+                            class="mt-2 w-full bg-slate-900 border border-white/10 rounded-2xl p-4 text-sm text-white focus:ring-2 focus:ring-sky-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Currency Code</label>
+                        <select name="currency" class="mt-2 w-full bg-slate-900 border border-white/10 rounded-2xl p-4 text-sm text-white focus:ring-2 focus:ring-sky-500 outline-none">
+                            <option value="TZS" <?php if($tenant['currency'] == 'TZS') echo 'selected'; ?>>TZS (Shilingi)</option>
+                            <option value="USD" <?php if($tenant['currency'] == 'USD') echo 'selected'; ?>>USD (Dollar)</option>
+                            <option value="KES" <?php if($tenant['currency'] == 'KES') echo 'selected'; ?>>KES (Kenya Shilling)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Business Phone</label>
+                    <input type="text" name="phone" value="<?php echo htmlspecialchars($tenant['phone']); ?>" 
+                        class="mt-2 w-full bg-slate-900 border border-white/10 rounded-2xl p-4 text-sm text-white focus:ring-2 focus:ring-sky-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Physical Address</label>
+                    <textarea name="address" rows="3" 
+                        class="mt-2 w-full bg-slate-900 border border-white/10 rounded-2xl p-4 text-sm text-white focus:ring-2 focus:ring-sky-500 outline-none"><?php echo htmlspecialchars($tenant['address']); ?></textarea>
+                </div>
+
+                <button type="submit" class="w-full bg-sky-500 py-4 rounded-2xl font-bold text-sm shadow-lg shadow-sky-500/20 hover:bg-sky-600 transition-all">
+                    Save Workspace Settings
+		</button>
+                
+                <div class="pt-6 border-t border-white/5">
+                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Enable Modules</h3>
+                <div class="space-y-4">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" name="has_microfinance" value="1" <?php echo $tenant['has_microfinance'] ? 'checked' : ''; ?> class="w-5 h-5 rounded bg-slate-900 border-white/10 text-sky-500">
+                    <span class="text-sm">Microfinance & Loans</span>
+                   </label>
+                   <label class="flex items-center gap-3 cursor-pointer">
+                   <input type="checkbox" name="has_retail" value="1" <?php echo $tenant['has_retail'] ? 'checked' : ''; ?> class="w-5 h-5 rounded bg-slate-900 border-white/10 text-sky-500">
+                  <span class="text-sm">Retail & POS Stock</span>
+                  </label>
+                </div>
+              </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
