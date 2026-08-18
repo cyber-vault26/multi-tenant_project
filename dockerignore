@@ -1,0 +1,4 @@
+.git
+vendor
+*.swp
+node_modules
