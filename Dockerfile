@@ -19,12 +19,20 @@ FROM php:8.2-apache
 
 # PDO MySQL is what db.php actually uses; mysqli/gd/mbstring
 # cover PHPMailer + dompdf's needs.
+#
+# Note: mod_php requires the prefork MPM. Installing libzip-dev/
+# libpng-dev below can pull in and auto-enable mpm_event as a
+# dependency, which then conflicts with prefork at startup
+# ("AH00534: More than one MPM loaded"). The last two lines
+# force prefork back on and disable the others.
 RUN docker-php-ext-install pdo pdo_mysql mysqli \
     && apt-get update \
     && apt-get install -y --no-install-recommends libzip-dev libpng-dev \
     && docker-php-ext-install gd zip \
     && a2enmod rewrite \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && (a2dismod mpm_event mpm_worker || true) \
+    && a2enmod mpm_prefork
 
 WORKDIR /var/www/html
 COPY . /var/www/html
