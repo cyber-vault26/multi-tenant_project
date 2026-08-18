@@ -1,20 +1,8 @@
--- ============================================================
--- schema.sql
--- Reverse-engineered database schema for multi-tenant_project
--- (cyber-vault26/multi-tenant_project)
---
--- This was built by reading every SQL query in the codebase.
--- The original repo shipped with no schema file, so review
--- column types/lengths before relying on this in production.
--- Engine: MariaDB / MySQL 8+, utf8mb4 (matches db.php charset)
--- ============================================================
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
--- ------------------------------------------------------------
--- tenants: one row per organisation (multi-tenancy root)
--- ------------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS tenants (
     id               INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name             VARCHAR(150) NOT NULL,
@@ -32,11 +20,7 @@ CREATE TABLE IF NOT EXISTS tenants (
     created_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ------------------------------------------------------------
--- users: staff/admin accounts, scoped to a tenant
--- tenant_id defaults to 1 for the very first signup flow
--- (see auth_process.php), so seed a placeholder tenant #1.
--- ------------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS users (
     id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     full_name      VARCHAR(150) NOT NULL,
@@ -48,9 +32,7 @@ CREATE TABLE IF NOT EXISTS users (
     CONSTRAINT fk_users_tenant FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ------------------------------------------------------------
--- branches: physical locations under a tenant
--- ------------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS branches (
     id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     tenant_id    INT UNSIGNED NOT NULL,
@@ -62,10 +44,7 @@ CREATE TABLE IF NOT EXISTS branches (
     CONSTRAINT fk_branches_tenant FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ------------------------------------------------------------
--- accounts: simple chart-of-accounts used for bookkeeping
--- (Cash on Hand / Bank Account / Loan Receivables / Expense accts)
--- ------------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS accounts (
     id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     tenant_id     INT UNSIGNED NOT NULL,
@@ -76,9 +55,7 @@ CREATE TABLE IF NOT EXISTS accounts (
     CONSTRAINT fk_accounts_tenant FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ------------------------------------------------------------
--- clients: customers a tenant lends money to / sells to
--- ------------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS clients (
     id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     tenant_id     INT UNSIGNED NOT NULL,
@@ -89,9 +66,7 @@ CREATE TABLE IF NOT EXISTS clients (
     CONSTRAINT fk_clients_tenant FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ------------------------------------------------------------
--- products: inventory items for the POS module
--- ------------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS products (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     tenant_id       INT UNSIGNED NOT NULL,
@@ -104,9 +79,7 @@ CREATE TABLE IF NOT EXISTS products (
     CONSTRAINT fk_products_tenant FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ------------------------------------------------------------
--- sales: POS transactions
--- ------------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS sales (
     id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     tenant_id     INT UNSIGNED NOT NULL,
@@ -118,9 +91,7 @@ CREATE TABLE IF NOT EXISTS sales (
     CONSTRAINT fk_sales_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ------------------------------------------------------------
--- loans: microloans issued to clients
--- ------------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS loans (
     id               INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     tenant_id        INT UNSIGNED NOT NULL,
@@ -134,9 +105,7 @@ CREATE TABLE IF NOT EXISTS loans (
     CONSTRAINT fk_loans_client FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ------------------------------------------------------------
--- loan_schedules: per-installment repayment plan for a loan
--- ------------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS loan_schedules (
     id                INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     tenant_id         INT UNSIGNED NOT NULL,
@@ -151,9 +120,7 @@ CREATE TABLE IF NOT EXISTS loan_schedules (
     CONSTRAINT fk_schedule_loan   FOREIGN KEY (loan_id)   REFERENCES loans(id)   ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ------------------------------------------------------------
--- repayments: actual payments collected against a loan
--- ------------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS repayments (
     id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     tenant_id      INT UNSIGNED NOT NULL,
@@ -166,9 +133,6 @@ CREATE TABLE IF NOT EXISTS repayments (
     CONSTRAINT fk_repay_user   FOREIGN KEY (collected_by) REFERENCES users(id)   ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ------------------------------------------------------------
--- journal_entries: simple accounting ledger lines
--- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS journal_entries (
     id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     tenant_id    INT UNSIGNED NOT NULL,
@@ -181,9 +145,7 @@ CREATE TABLE IF NOT EXISTS journal_entries (
     CONSTRAINT fk_journal_account FOREIGN KEY (account_id) REFERENCES accounts(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ------------------------------------------------------------
--- expenses: business expenses logged against an expense account
--- ------------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS expenses (
     id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     tenant_id     INT UNSIGNED NOT NULL,
@@ -198,9 +160,7 @@ CREATE TABLE IF NOT EXISTS expenses (
     CONSTRAINT fk_expenses_user    FOREIGN KEY (created_by) REFERENCES users(id)    ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ------------------------------------------------------------
--- audit_logs: activity trail per tenant/user
--- ------------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS audit_logs (
     id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     tenant_id   INT UNSIGNED NOT NULL,
@@ -213,9 +173,7 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     CONSTRAINT fk_audit_user   FOREIGN KEY (user_id)   REFERENCES users(id)   ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- ------------------------------------------------------------
--- password_resets: token-based reset flow (forgot-password.php)
--- ------------------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS password_resets (
     id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     email       VARCHAR(150) NOT NULL,

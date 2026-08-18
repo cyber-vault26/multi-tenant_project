@@ -1,13 +1,20 @@
 <?php
 date_default_timezone_set('Africa/Nairobi'); 
 
-
-$host     = getenv('MYSQLHOST') ?: 'localhost';
-$db_name  = getenv('MYSQLDATABASE') ?: 'multi_tenant_system'; 
-$username = getenv('MYSQLUSER') ?: 'admin_erp';             
-$password = getenv('MYSQLPASSWORD') ?: 'kali'; // 'kali' ndio default yako local
+$host     = getenv('MYSQLHOST');
+$db_name  = getenv('MYSQLDATABASE');
+$username = getenv('MYSQLUSER');
+$password = getenv('MYSQLPASSWORD');
 $port     = getenv('MYSQLPORT') ?: '3306';
 $charset  = 'utf8mb4';
+
+if (!$host) {
+    $host     = 'localhost';
+    $db_name  = 'multi_tenant_system';
+    $username = 'admin_erp';
+    $password = 'kali';
+    $port     = '3306';
+}
 
 $dsn = "mysql:host=$host;dbname=$db_name;port=$port;charset=$charset";
 
@@ -20,9 +27,8 @@ $options = [
 try {
     $pdo = new PDO($dsn, $username, $password, $options);
 } catch (PDOException $e) {
-      die("Database Connection Error. Please check environment variables.");
+    die("Database Connection Error: " . $e->getMessage());
 }
-
 if (isset($_SESSION['tenant_id'])) {
     $stmt = $pdo->prepare("SELECT currency, name FROM tenants WHERE id = ?");
     $stmt->execute([$_SESSION['tenant_id']]);
