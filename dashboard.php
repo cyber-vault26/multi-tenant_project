@@ -89,7 +89,17 @@ for ($i = 6; $i >= 0; $i--) {
                     Workspace: <?php echo htmlspecialchars($org_name); ?>
                 </div>
             </div>
-        </header>
+	</header>
+        <!-- Kitufe cha Menu kwa ajili ya Simu -->
+       <div class="lg:hidden flex items-center justify-between p-4 bg-slate-900 border-b border-white/5 mb-4 rounded-xl">
+       <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-slate-950 text-xs">SB</div>
+        <span class="font-bold text-sm">Strong Bridge</span>
+       </div>
+       <button onclick="toggleSidebar()" class="p-2 text-slate-400 hover:bg-white/5 rounded-lg">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+      </button>
+      </div>
 
         <!-- Stats Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -121,8 +131,10 @@ for ($i = 6; $i >= 0; $i--) {
 		<h3 class="font-bold">Recent Loan Activities</h3>
                 <a href="loans.php" class="text-xs text-sky-400 hover:underline">View all loans</a>
             </div>
-            <div class="p-0">
-                <table class="w-full text-left text-sm">
+	    <div class="p-0">
+               <div class="overflow-x-auto w-full">
+                  
+                <table class="w-full text-left text-sm min-w-[600px]">
                     <thead class="bg-white/5 text-slate-500 text-[10px] uppercase">
                         <tr>
                             <th class="p-5">Customer</th>
@@ -151,7 +163,8 @@ for ($i = 6; $i >= 0; $i--) {
                         </tr>
                         <?php endif; ?>
                     </tbody>
-                </table>
+		</table>
+               </div>
 	    </div>
             <div class="mt-10 glass-card p-8 rounded-[2.5rem]">
                <h3 class="font-bold mb-6 text-white flex items-center gap-2">

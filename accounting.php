@@ -34,7 +34,17 @@ $accounts = $stmt->fetchAll();
         <header class="mb-10">
             <h1 class="text-3xl font-bold">General Ledger (Uhasibu)</h1>
             <p class="text-slate-500 text-sm">Hali ya kifedha ya akaunti zako zote.</p>
-        </header>
+	</header>
+       <!-- Kitufe cha Menu kwa ajili ya Simu -->
+<div class="lg:hidden flex items-center justify-between p-4 bg-slate-900 border-b border-white/5 mb-4 rounded-xl">
+    <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-slate-950 text-xs">SB</div>
+        <span class="font-bold text-sm">Strong Bridge</span>
+    </div>
+    <button onclick="toggleSidebar()" class="p-2 text-slate-400 hover:bg-white/5 rounded-lg">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+    </button>
+</div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <?php foreach($accounts as $acc): ?>
