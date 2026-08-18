@@ -68,6 +68,7 @@ $regions = ["Arusha", "Dar es Salaam", "Dodoma", "Geita", "Iringa", "Kagera", "K
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register Organization — SBI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -323,7 +324,7 @@ $regions = ["Arusha", "Dar es Salaam", "Dodoma", "Geita", "Iringa", "Kagera", "K
             document.getElementById('review-content').innerHTML = html;
         }
         
-        // Init first node
+ 
         document.getElementById('node-1').classList.add('active');
     </script>
 </body>

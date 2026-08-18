@@ -18,6 +18,7 @@ $tenants = $pdo->query("SELECT * FROM tenants WHERE id > 1 ORDER BY created_at D
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Platform Admin — Strong Bridge Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>body { background-color: #020617; color: white; } .glass { background: rgba(15,23,42,0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }</style>

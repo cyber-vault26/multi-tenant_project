@@ -2,7 +2,7 @@
 require 'db.php';
 session_start();
 
-// 1. Ulinzi: Hakikisha mtu amelogin na ni Admin
+
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit();
@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 $tenant_id = $_SESSION['tenant_id'];
 
-// 2. Pata wafanyakazi wa kampuni hii tu
+
 $stmt = $pdo->prepare("SELECT id, full_name, email, role, created_at FROM users WHERE tenant_id = ? ORDER BY created_at DESC");
 $stmt->execute([$tenant_id]);
 $staff = $stmt->fetchAll();
@@ -20,6 +20,7 @@ $staff = $stmt->fetchAll();
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff Management — Strong Bridge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>

@@ -28,6 +28,7 @@ logAction($pdo, "Staff Added", "Registered new staff: " . $fullName);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audit Logs — Strong Bridge</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
