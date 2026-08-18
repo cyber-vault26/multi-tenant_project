@@ -1,6 +1,7 @@
 <?php
 date_default_timezone_set('Africa/Nairobi'); 
 
+// Railway Environment Variables
 $host     = getenv('MYSQLHOST');
 $db_name  = getenv('MYSQLDATABASE');
 $username = getenv('MYSQLUSER');
@@ -8,11 +9,12 @@ $password = getenv('MYSQLPASSWORD');
 $port     = getenv('MYSQLPORT') ?: '3306';
 $charset  = 'utf8mb4';
 
+// Ikiwa hatupo live (mfano upo local Kali), tumia sifa za local
 if (!$host) {
     $host     = 'localhost';
     $db_name  = 'multi_tenant_system';
     $username = 'admin_erp';
-    $password = 'kali';
+    $password = 'kali'; 
     $port     = '3306';
 }
 
@@ -27,8 +29,19 @@ $options = [
 try {
     $pdo = new PDO($dsn, $username, $password, $options);
 } catch (PDOException $e) {
-    die("Database Connection Error: " . $e->getMessage());
+    // HAPA NDIO MUHIMU: Itakuambia kosa ni nini (mfano: Access Denied, au Unknown Host)
+    echo "<h1>Database Connection Failed</h1>";
+    echo "<p>Error Message: " . $e->getMessage() . "</p>";
+    echo "<hr>";
+    echo "<strong>Check these variables in Railway:</strong><br>";
+    echo "Host: $host <br>";
+    echo "Database: $db_name <br>";
+    echo "User: $username <br>";
+    echo "Port: $port <br>";
+    exit();
 }
+
+// Global Constants
 if (isset($_SESSION['tenant_id'])) {
     $stmt = $pdo->prepare("SELECT currency, name FROM tenants WHERE id = ?");
     $stmt->execute([$_SESSION['tenant_id']]);
