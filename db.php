@@ -1,12 +1,15 @@
 <?php
 date_default_timezone_set('Africa/Nairobi'); 
-$host     = 'localhost';
-$db_name  = 'multi_tenant_system'; 
-$username = 'admin_erp';             
-$password = 'kali';                 
+
+
+$host     = getenv('MYSQLHOST') ?: 'localhost';
+$db_name  = getenv('MYSQLDATABASE') ?: 'multi_tenant_system'; 
+$username = getenv('MYSQLUSER') ?: 'admin_erp';             
+$password = getenv('MYSQLPASSWORD') ?: 'kali'; // 'kali' ndio default yako local
+$port     = getenv('MYSQLPORT') ?: '3306';
 $charset  = 'utf8mb4';
 
-$dsn = "mysql:host=$host;dbname=$db_name;charset=$charset";
+$dsn = "mysql:host=$host;dbname=$db_name;port=$port;charset=$charset";
 
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, 
@@ -17,7 +20,7 @@ $options = [
 try {
     $pdo = new PDO($dsn, $username, $password, $options);
 } catch (PDOException $e) {
-    die("Database Connection Error: " . $e->getMessage());
+      die("Database Connection Error. Please check environment variables.");
 }
 
 if (isset($_SESSION['tenant_id'])) {
@@ -30,4 +33,3 @@ if (isset($_SESSION['tenant_id'])) {
     define('CURRENCY', 'TZS');
     define('BIZ_NAME', 'Strong Bridge');
 }
-?>
