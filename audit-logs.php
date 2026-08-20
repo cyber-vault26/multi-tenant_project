@@ -20,8 +20,6 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$tenant_id]);
 $logs = $stmt->fetchAll();
-require_once 'includes/functions.php';
-logAction($pdo, "Staff Added", "Registered new staff: " . $fullName);
 ?>
 
 <!DOCTYPE html>

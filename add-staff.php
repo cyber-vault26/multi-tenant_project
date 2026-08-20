@@ -1,5 +1,6 @@
 <?php
 require 'db.php';
+require 'includes/functions.php';
 session_start();
 
 if ($_SESSION['role'] !== 'admin') { die("You are not allowed to add employee!"); }
@@ -9,11 +10,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
     $role = $_POST['role'];
+    $department = trim($_POST['department'] ?? '') ?: null;
+    $positionTitle = trim($_POST['position_title'] ?? '') ?: null;
+    $employmentType = $_POST['employment_type'] ?? 'full_time';
+    $hireDate = $_POST['hire_date'] ?? null;
+    $phone = trim($_POST['phone'] ?? '') ?: null;
     $tenant_id = $_SESSION['tenant_id'];
 
     try {
-        $stmt = $pdo->prepare("INSERT INTO users (full_name, email, password_hash, tenant_id, role) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$fullName, $email, $password, $tenant_id, $role]);
+        $stmt = $pdo->prepare("INSERT INTO users (full_name, email, password_hash, tenant_id, role, department, position_title, employment_type, hire_date, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$fullName, $email, $password, $tenant_id, $role, $department, $positionTitle, $employmentType, $hireDate, $phone]);
+
+        logAction($pdo, "Staff Added", "Registered new staff: " . $fullName);
+
         header("Location: staff.php?msg=added");
         exit();
     } catch (PDOException $e) {
@@ -54,7 +63,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <option value="manager">Manager (Reports + Staff)</option>
                 <option value="admin">Admin (All Access)</option>
             </select>
-            
+
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">HR Details</label>
+            <div class="grid grid-cols-2 gap-4">
+                <input type="text" name="department" placeholder="Department" class="w-full bg-slate-900 border border-white/10 p-4 rounded-xl text-white outline-none">
+                <input type="text" name="position_title" placeholder="Job Title" class="w-full bg-slate-900 border border-white/10 p-4 rounded-xl text-white outline-none">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <select name="employment_type" class="w-full bg-slate-900 border border-white/10 p-4 rounded-xl text-white outline-none">
+                    <option value="full_time">Full-time</option>
+                    <option value="part_time">Part-time</option>
+                    <option value="contract">Contract</option>
+                </select>
+                <input type="date" name="hire_date" class="w-full bg-slate-900 border border-white/10 p-4 rounded-xl text-white outline-none">
+            </div>
+            <input type="text" name="phone" placeholder="Phone Number" class="w-full bg-slate-900 border border-white/10 p-4 rounded-xl text-white outline-none">
+
             <button type="submit" class="w-full bg-sky-500 py-4 rounded-xl font-bold">Create Staff Account</button>
             <a href="staff.php" class="block text-center text-sm text-slate-500 mt-4 underline">Cancel</a>
         </form>

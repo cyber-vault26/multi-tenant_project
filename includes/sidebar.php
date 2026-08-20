@@ -76,6 +76,14 @@
             </a>
         <?php endif; ?>
 
+        <!-- HUMAN RESOURCES (everyone: attendance is self-service) -->
+        <div class="pt-4 pb-2 px-3 text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">Human Resources</div>
+
+        <a href="attendance.php" class="flex items-center gap-3 p-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all group">
+            <svg class="w-5 h-5 text-slate-500 group-hover:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Attendance
+        </a>
+
         <!-- ADMINISTRATION (Admin Only) -->
         <?php if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'super_admin'): ?>
             <div class="pt-4 pb-2 px-3 text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">Administration</div>

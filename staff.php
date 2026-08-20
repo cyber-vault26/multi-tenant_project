@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 $tenant_id = $_SESSION['tenant_id'];
 
 
-$stmt = $pdo->prepare("SELECT id, full_name, email, role, created_at FROM users WHERE tenant_id = ? ORDER BY created_at DESC");
+$stmt = $pdo->prepare("SELECT id, full_name, email, role, department, position_title, created_at FROM users WHERE tenant_id = ? ORDER BY created_at DESC");
 $stmt->execute([$tenant_id]);
 $staff = $stmt->fetchAll();
 ?>
@@ -47,9 +47,14 @@ $staff = $stmt->fetchAll();
                 <h1 class="text-3xl font-bold">Wafanyakazi (Staff)</h1>
                 <p class="text-slate-500 text-sm">Simamia timu inayofanya kazi kwenye workspace yako.</p>
             </div>
-            <a href="add-staff.php" class="bg-sky-500 hover:bg-sky-600 text-white px-6 py-3 rounded-xl text-sm font-bold transition-all">
-                + Sajili Mfanyakazi
-            </a>
+            <div class="flex gap-3">
+                <a href="attendance.php" class="bg-white/5 border border-white/10 hover:bg-white/10 text-white px-6 py-3 rounded-xl text-sm font-bold transition-all">
+                    Attendance
+                </a>
+                <a href="add-staff.php" class="bg-sky-500 hover:bg-sky-600 text-white px-6 py-3 rounded-xl text-sm font-bold transition-all">
+                    + Sajili Mfanyakazi
+                </a>
+            </div>
         </header>
 
         <div class="glass-card rounded-[2rem] overflow-hidden">
@@ -59,6 +64,7 @@ $staff = $stmt->fetchAll();
                         <th class="p-5">Jina Kamili</th>
                         <th class="p-5">Email</th>
                         <th class="p-5">Role</th>
+                        <th class="p-5">Department / Title</th>
                         <th class="p-5">Siku ya Kujiunga</th>
                         <th class="p-5">Action</th>
                     </tr>
@@ -72,6 +78,16 @@ $staff = $stmt->fetchAll();
                             <span class="px-3 py-1 rounded-lg text-[10px] font-bold uppercase <?php echo ($s['role'] == 'admin') ? 'bg-sky-500/10 text-sky-400' : 'bg-slate-500/10 text-slate-400'; ?>">
                                 <?php echo $s['role']; ?>
                             </span>
+                        </td>
+                        <td class="p-5 text-slate-400">
+                            <?php if ($s['department'] || $s['position_title']): ?>
+                                <?php echo htmlspecialchars($s['position_title'] ?: '—'); ?>
+                                <?php if ($s['department']): ?>
+                                    <span class="text-slate-600">· <?php echo htmlspecialchars($s['department']); ?></span>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <span class="text-slate-600 italic">Not set</span>
+                            <?php endif; ?>
                         </td>
                         <td class="p-5 text-slate-500"><?php echo date('M d, Y', strtotime($s['created_at'])); ?></td>
                         <td class="p-5">
