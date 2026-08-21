@@ -8,10 +8,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $p_price = $_POST['purchase_price'];
     $s_price = $_POST['sale_price'];
     $qty = $_POST['stock_quantity'];
+    $description = trim($_POST['description'] ?? '') ?: null;
+    $imageUrl = trim($_POST['image_url'] ?? '') ?: null;
+    $isPublished = isset($_POST['is_published']) ? 1 : 0;
     $tenant_id = $_SESSION['tenant_id'];
 
-    $stmt = $pdo->prepare("INSERT INTO products (tenant_id, name, sku, purchase_price, sale_price, stock_quantity) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$tenant_id, $name, $sku, $p_price, $s_price, $qty]);
+    $stmt = $pdo->prepare("INSERT INTO products (tenant_id, name, sku, purchase_price, sale_price, stock_quantity, description, image_url, is_published) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$tenant_id, $name, $sku, $p_price, $s_price, $qty, $description, $imageUrl, $isPublished]);
 
     header("Location: inventory.php");
     exit();
@@ -49,7 +52,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             
             <input type="number" name="stock_quantity" placeholder="Kiasi kilichopo (Quantity)" required class="w-full bg-slate-900 border border-white/10 p-4 rounded-xl text-white outline-none focus:ring-2 focus:ring-sky-500">
-            
+
+            <div class="border-t border-white/10 pt-4">
+                <p class="text-[10px] uppercase font-bold text-slate-500 mb-3">Online Store (optional)</p>
+                <textarea name="description" placeholder="Product description" rows="2" class="w-full bg-slate-900 border border-white/10 p-4 rounded-xl text-white outline-none focus:ring-2 focus:ring-sky-500 mb-3"></textarea>
+                <input type="text" name="image_url" placeholder="Image URL (https://...)" class="w-full bg-slate-900 border border-white/10 p-4 rounded-xl text-white outline-none focus:ring-2 focus:ring-sky-500 mb-3">
+                <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" name="is_published" value="1" class="w-5 h-5 accent-sky-500">
+                    Show this product on the online store
+                </label>
+            </div>
+
             <button type="submit" class="w-full bg-sky-500 py-4 rounded-xl font-bold">Store Product</button>
             <a href="inventory.php" class="block text-center text-sm text-slate-500 mt-4">Cancel</a>
         </form>

@@ -18,9 +18,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $currency = $_POST['currency'];
     $address = $_POST['address'];
     $phone = $_POST['phone'];
+    $storeEnabled = isset($_POST['store_enabled']) ? 1 : 0;
+    $storeSlugInput = trim($_POST['store_slug'] ?? '');
+    // Keep slugs URL-safe: lowercase, alphanumeric + dashes only.
+    $storeSlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $storeSlugInput));
+    $storeSlug = trim($storeSlug, '-') ?: null;
 
-    $stmt = $pdo->prepare("UPDATE tenants SET name = ?, currency = ?, address = ?, phone = ? WHERE id = ?");
-    $stmt->execute([$name, $currency, $address, $phone, $tenant_id]);
+    if ($storeSlug) {
+        // Make sure another tenant hasn't already taken this slug.
+        $check = $pdo->prepare("SELECT id FROM tenants WHERE store_slug = ? AND id != ?");
+        $check->execute([$storeSlug, $tenant_id]);
+        if ($check->fetch()) {
+            die("That store URL is already taken by another business. Please choose a different one.");
+        }
+    }
+
+    $stmt = $pdo->prepare("UPDATE tenants SET name = ?, currency = ?, address = ?, phone = ?, store_enabled = ?, store_slug = ? WHERE id = ?");
+    $stmt->execute([$name, $currency, $address, $phone, $storeEnabled, $storeSlug, $tenant_id]);
     
     logAction($pdo, "Settings Updated", "Updated workspace branding and info.");
     header("Location: settings.php?msg=updated");
@@ -91,6 +105,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <button type="submit" class="w-full bg-sky-500 py-4 rounded-2xl font-bold text-sm shadow-lg shadow-sky-500/20 hover:bg-sky-600 transition-all">
                     Save Workspace Settings
 		</button>
+
+                <div class="pt-6 border-t border-white/5">
+                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Online Store</h3>
+                    <label class="flex items-center gap-3 cursor-pointer mb-4">
+                        <input type="checkbox" name="store_enabled" value="1" <?php echo !empty($tenant['store_enabled']) ? 'checked' : ''; ?> class="w-5 h-5 rounded bg-slate-900 border-white/10 text-sky-500">
+                        <span class="text-sm">Enable public online storefront</span>
+                    </label>
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Store URL</label>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="text-xs text-slate-600 whitespace-nowrap">/store.php?shop=</span>
+                        <input type="text" name="store_slug" value="<?php echo htmlspecialchars($tenant['store_slug'] ?? ''); ?>"
+                               placeholder="your-business-name"
+                               class="w-full bg-slate-900 border border-white/10 rounded-xl p-3 text-sm text-white focus:ring-2 focus:ring-sky-500 outline-none">
+                    </div>
+                    <?php if (!empty($tenant['store_slug']) && !empty($tenant['store_enabled'])): ?>
+                        <p class="text-xs text-emerald-400 mt-2">
+                            Live at: <a href="store.php?shop=<?php echo urlencode($tenant['store_slug']); ?>" target="_blank" class="underline">store.php?shop=<?php echo htmlspecialchars($tenant['store_slug']); ?></a>
+                        </p>
+                    <?php endif; ?>
+                    <p class="text-xs text-slate-600 mt-2">Mark products as "Show on online store" in Inventory to make them appear here.</p>
+                </div>
                 
                 <div class="pt-6 border-t border-white/5">
                     <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Enable Modules</h3>
