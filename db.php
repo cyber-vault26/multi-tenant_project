@@ -1,7 +1,7 @@
 <?php
-date_default_timezone_set('Africa/Nairobi'); 
+date_default_timezone_set('Africa/Nairobi');
 
-// Railway Environment Variables
+// 1. Railway (or any host that injects real environment variables)
 $host     = getenv('MYSQLHOST');
 $db_name  = getenv('MYSQLDATABASE');
 $username = getenv('MYSQLUSER');
@@ -9,12 +9,26 @@ $password = getenv('MYSQLPASSWORD');
 $port     = getenv('MYSQLPORT') ?: '3306';
 $charset  = 'utf8mb4';
 
-// Ikiwa hatupo live (mfano upo local Kali), tumia sifa za local
+// 2. cPanel or any host without injected env vars: config.local.php.
+// This file is gitignored — it exists only on the actual server and
+// is never committed, so real credentials never touch GitHub.
+if (!$host && file_exists(__DIR__ . '/config.local.php')) {
+    require_once __DIR__ . '/config.local.php';
+    if (defined('DB_HOST')) {
+        $host     = DB_HOST;
+        $db_name  = DB_NAME;
+        $username = DB_USER;
+        $password = DB_PASS;
+        $port     = defined('DB_PORT') ? DB_PORT : '3306';
+    }
+}
+
+// 3. Local development fallback (e.g. testing on your own machine)
 if (!$host) {
     $host     = 'localhost';
     $db_name  = 'multi_tenant_system';
     $username = 'admin_erp';
-    $password = 'kali'; 
+    $password = 'kali';
     $port     = '3306';
 }
 

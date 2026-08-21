@@ -1,0 +1,32 @@
+<?php
+/**
+ * config.local.php.example
+ *
+ * This is a TEMPLATE. Copy this file to config.local.php (same folder)
+ * and fill in real values there. config.local.php is in .gitignore —
+ * it will never be committed, so real credentials never touch GitHub.
+ *
+ * On Railway, none of this file is needed — db.php reads Railway's
+ * injected MYSQLHOST/MYSQLDATABASE/etc environment variables directly.
+ * This file is specifically for hosts like cPanel that don't support
+ * injected environment variables.
+ */
+
+// --- Database ---
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'cpanelusername_dbname');
+define('DB_USER', 'cpanelusername_dbuser');
+define('DB_PASS', 'your-real-db-password');
+define('DB_PORT', '3306');
+
+// --- Outgoing email (used by forgot_process.php for password resets) ---
+define('SMTP_HOST', 'smtp.gmail.com');
+define('SMTP_USER', 'youraddress@gmail.com');
+define('SMTP_PASS', 'your-gmail-app-password');
+define('SMTP_PORT', 587);
+define('SMTP_FROM_EMAIL', 'no-reply@yourdomain.com');
+define('SMTP_FROM_NAME', 'Strong Bridge Support');
+
+// --- Base URL (used to build links in emails, e.g. password resets) ---
+// No trailing slash.
+define('APP_BASE_URL', 'https://yourdomain.com');

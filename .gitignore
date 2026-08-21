@@ -1,0 +1,13 @@
+# Local/server-only secrets — never commit real credentials
+config.local.php
+
+# Editor artifacts
+*.swp
+*.swo
+*~
+
+# OS artifacts
+.DS_Store
+
+# Dependency dirs some hosts prefer to rebuild rather than commit
+node_modules/

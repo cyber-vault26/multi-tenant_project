@@ -6,6 +6,39 @@ require 'vendor/autoload.php';
 require 'db.php';
 date_default_timezone_set('Africa/Nairobi'); 
 
+// Same fallback chain as db.php: env vars (Railway-style) first,
+// then config.local.php (cPanel/other hosts), no hardcoded secrets.
+$smtpHost = getenv('SMTP_HOST');
+$smtpUser = getenv('SMTP_USER');
+$smtpPass = getenv('SMTP_PASS');
+$smtpPort = getenv('SMTP_PORT') ?: 587;
+$fromEmail = getenv('SMTP_FROM_EMAIL');
+$fromName = getenv('SMTP_FROM_NAME') ?: 'Strong Bridge Support';
+$baseUrl = getenv('APP_BASE_URL');
+
+if (!$smtpUser && file_exists(__DIR__ . '/config.local.php')) {
+    require_once __DIR__ . '/config.local.php';
+    if (defined('SMTP_USER')) {
+        $smtpHost = SMTP_HOST;
+        $smtpUser = SMTP_USER;
+        $smtpPass = SMTP_PASS;
+        $smtpPort = defined('SMTP_PORT') ? SMTP_PORT : 587;
+        $fromEmail = defined('SMTP_FROM_EMAIL') ? SMTP_FROM_EMAIL : $smtpUser;
+        $fromName = defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : $fromName;
+    }
+    if (defined('APP_BASE_URL')) {
+        $baseUrl = APP_BASE_URL;
+    }
+}
+
+// Last resort: build the base URL from the actual request, so this
+// works correctly on whatever domain it's actually running on,
+// rather than a hardcoded value that breaks the moment you move hosts.
+if (!$baseUrl) {
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $baseUrl = $scheme . '://' . $_SERVER['HTTP_HOST'];
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
 
@@ -21,21 +54,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, ?)");
         $stmt->execute([$email, $token, $expires]);
 
-        $resetLink = "http://localhost:8000/reset-password.php?token=" . $token;
+        $resetLink = $baseUrl . "/reset-password.php?token=" . $token;
+
+        if (!$smtpUser) {
+            // No SMTP configured on this environment — fail loudly in
+            // logs rather than silently pretending an email was sent.
+            error_log("Password reset requested for $email but no SMTP credentials are configured (set SMTP_USER/SMTP_PASS via env vars or config.local.php).");
+            header("Location: forgot-password.php?msg=sent");
+            exit();
+        }
 
         $mail = new PHPMailer(true);
 
         try {
             $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com';                     
+            $mail->Host       = $smtpHost;
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'malalelufungulo@gmail.com';              
-            $mail->Password   = 'bzwl vxcu agnx izrk';                
+            $mail->Username   = $smtpUser;
+            $mail->Password   = $smtpPass;
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port       = 587;
+            $mail->Port       = $smtpPort;
 
             
-            $mail->setFrom('no-reply@strongbridge.com', 'Strong Bridge Support');
+            $mail->setFrom($fromEmail ?: $smtpUser, $fromName);
             $mail->addAddress($email);
 
             
