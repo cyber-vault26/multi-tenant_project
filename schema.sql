@@ -186,11 +186,11 @@ CREATE TABLE IF NOT EXISTS password_resets (
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ------------------------------------------------------------
--- Seed data: platform.php treats tenant id 1 as the "Lobby" /
+-- Seed data: platform.php treats tenant id 1 as the "sysAdmin" /
 -- platform-owner tenant, and new self-registrations default
 -- new users to tenant_id = 1 until they run setup-org.php.
 -- Without this row, first signup (auth_process.php) will fail
 -- its foreign key check.
 -- ------------------------------------------------------------
 INSERT INTO tenants (id, name, currency, status)
-VALUES (1, 'Platform Lobby', 'TZS', 'active');
+VALUES (1, 'sysAdmin', 'TZS', 'active');

@@ -9,8 +9,6 @@
 -- data model, so they get their own tables rather than being
 -- bolted onto `clients`/`loans`.
 --
--- Run this against your EXISTING Railway database, same way you
--- ran migration_002.
 -- ============================================================
 
 -- ---- 1. Members ----------------------------------------------

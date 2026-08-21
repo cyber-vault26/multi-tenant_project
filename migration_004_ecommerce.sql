@@ -5,8 +5,6 @@
 -- (no login required for customers), a session-based cart,
 -- guest checkout, and admin order management.
 --
--- Run this against your EXISTING Railway database, same way
--- as migration_002 and migration_003.
 -- ============================================================
 
 -- ---- 1. Storefront settings on tenants -----------------------

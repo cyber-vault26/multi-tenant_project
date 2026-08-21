@@ -128,18 +128,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 
                 <div class="pt-6 border-t border-white/5">
-                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Enable Modules</h3>
-                <div class="space-y-4">
-                    <label class="flex items-center gap-3 cursor-pointer">
-                    <input type="checkbox" name="has_microfinance" value="1" <?php echo $tenant['has_microfinance'] ? 'checked' : ''; ?> class="w-5 h-5 rounded bg-slate-900 border-white/10 text-sky-500">
-                    <span class="text-sm">Microfinance & Loans</span>
-                   </label>
-                   <label class="flex items-center gap-3 cursor-pointer">
-                   <input type="checkbox" name="has_retail" value="1" <?php echo $tenant['has_retail'] ? 'checked' : ''; ?> class="w-5 h-5 rounded bg-slate-900 border-white/10 text-sky-500">
-                  <span class="text-sm">Retail & POS Stock</span>
-                  </label>
+                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Active Modules</h3>
+                    <p class="text-xs text-slate-600">Microfinance, Retail POS, SACCOS, HR/Attendance, and the Online Store are all available in the sidebar — there's no on/off switch here since each module only shows data once you start using it.</p>
                 </div>
-              </div>
             </form>
         </div>
     </div>
