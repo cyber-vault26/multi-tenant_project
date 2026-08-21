@@ -76,6 +76,21 @@
             </a>
         <?php endif; ?>
 
+        <!-- SACCOS -->
+        <div class="pt-4 pb-2 px-3 text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">SACCOS</div>
+
+        <a href="sacco-members.php" class="flex items-center gap-3 p-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all group">
+            <svg class="w-5 h-5 text-slate-500 group-hover:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6 4v2m-6-6a4 4 0 00-4 4v2"></path></svg>
+            Members
+        </a>
+
+        <?php if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'manager' || $_SESSION['role'] === 'super_admin'): ?>
+        <a href="dividends.php" class="flex items-center gap-3 p-3 text-sm text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all group">
+            <svg class="w-5 h-5 text-slate-500 group-hover:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 9v-1m0-9c-1.11 0-2.08.402-2.599 1M12 21a9 9 0 100-18 9 9 0 000 18z"></path></svg>
+            Dividends
+        </a>
+        <?php endif; ?>
+
         <!-- HUMAN RESOURCES (everyone: attendance is self-service) -->
         <div class="pt-4 pb-2 px-3 text-[10px] font-bold text-slate-600 uppercase tracking-[0.2em]">Human Resources</div>
 

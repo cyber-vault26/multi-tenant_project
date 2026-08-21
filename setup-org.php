@@ -46,7 +46,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->prepare("UPDATE users SET tenant_id = ?, role = 'admin' WHERE id = ?")->execute([$tenant_id, $_SESSION['user_id']]);
         
         // 5. Seed Accounts
-        $pdo->prepare("INSERT INTO accounts (tenant_id, account_name, account_type) VALUES (?, 'Cash on Hand', 'Asset'), (?, 'Bank Account', 'Asset')")->execute([$tenant_id, $tenant_id]);
+        $pdo->prepare("INSERT INTO accounts (tenant_id, account_name, account_type) VALUES
+                        (?, 'Cash on Hand', 'Asset'), (?, 'Bank Account', 'Asset'),
+                        (?, 'Member Shares Capital', 'Equity'), (?, 'Member Savings Deposits', 'Liability'), (?, 'Dividends Paid', 'Expense')")
+            ->execute([$tenant_id, $tenant_id, $tenant_id, $tenant_id, $tenant_id]);
 
         $_SESSION['tenant_id'] = $tenant_id;
         $_SESSION['role'] = 'admin';
